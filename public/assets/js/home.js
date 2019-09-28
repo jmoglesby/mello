@@ -32,13 +32,29 @@ function handleFormSubmit(event) {
     return;
   }
 
-  console.log(
-    `Email: ${email} || Password: ${password} || Auth Settings: ${authSetting}`
-  );
+  $emailInput.val('');
+   $passwordInput.val('');
+
+  authenticateUser(email, password);
 }
 
 function displayMessage(message, type) {
   $message.text(message).attr('class', type);
+}
+
+function authenticateUser(email, password) {
+  $.ajax({
+    url: '/' + authSetting,
+    data: {
+      user: {
+        email,
+        password
+      }
+    },
+    method: 'POST'
+  }).then(function(data) {
+    console.log(data);
+  });
 }
 
 $setLogin.on('click', setAuth.bind(null, 'login'));
