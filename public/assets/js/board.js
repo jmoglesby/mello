@@ -1,5 +1,6 @@
 const $logoutButton = $('#logout');
 const $boardContainer = $('.container');
+const $boardName = $('header > h1');
 
 let board;
 
@@ -46,11 +47,23 @@ function createLists(lists) {
     return $listContainer;
   });
 
+  let $addListContainer = $('<div class="list add">');
+  let $addListButton = $('<button>')
+    .text('+ Add another list')
+    .on('click', function() {
+      console.log('clicked');
+    });
+
+  $addListContainer.append($addListButton);
+  $listContainers.push($addListContainer);
+
   return $listContainers;
 }
 
 function renderBoard() {
   let $lists = createLists(board.lists);
+
+  $boardName.text(board.name);
 
   $boardContainer.empty();
   $boardContainer.append($lists);
