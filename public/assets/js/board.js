@@ -3,8 +3,13 @@ const $boardContainer = $('.container');
 const $boardName = $('header > h1');
 const $createListInput = $('#create-list input');
 const $saveListButton = $('#create-list .save');
+const $createCardInput = $('#create-card textarea');
+const $saveCardButton = $('#create-card .save');
+
+
 
 let board;
+let listID;
 
 init();
 
@@ -37,10 +42,11 @@ function handleLogout() {
 
 function createLists(lists) {
   let $listContainers = lists.map(function(list) {
-    let $listContainer = $('<div class="list">');
+    let $listContainer = $(`<div class="list" id="${list.id}">`);
     let $header = $('<header>');
     let $headerButton = $('<button>').text(list.title);
-    let $addCardButton = $('<button>Add a card...</button>');
+    let $addCardButton = $('<button>Add a card...</button>')
+      .on('click', openCardCreateModal);
 
     $header.append($headerButton);
     $listContainer.append($header);
@@ -74,6 +80,12 @@ function openListCreateModal() {
   MicroModal.show('create-list');
 }
 
+function openCardCreateModal(event) {
+  $createCardInput.val('');
+  listID = event.target.parentNode.id;
+  MicroModal.show('create-card');
+}
+
 function handleListCreate(event) {
   event.preventDefault();
 
@@ -97,5 +109,30 @@ function handleListCreate(event) {
   });
 }
 
+function handleCardCreate(event) {
+  event.preventDefault();
+
+  let cardText = $createCardInput.val().trim();
+
+  if (!cardText) {
+    MicroModal.close('create-card');
+    return;
+  }
+
+  $.ajax({
+    url: '/api/cards',
+    method: 'POST',
+    data: {
+      list_id: listID,
+      text: cardText
+    }
+  }).then(function(data) {
+    init();
+    console.log(data);
+    MicroModal.close('create-card');
+  });
+}
+
+$saveCardButton.on('click', handleCardCreate);
 $saveListButton.on('click', handleListCreate);
 $logoutButton.on('click', handleLogout);
