@@ -9,7 +9,6 @@ const $saveCardButton = $('#create-card .save');
 
 
 let board;
-let listID;
 
 init();
 
@@ -42,18 +41,16 @@ function handleLogout() {
 
 function createLists(lists) {
   let $listContainers = lists.map(function(list) {
-    let $listContainer = $(`<div class="list" id="${list.id}">`);
+    let $listContainer = $('<div class="list">').data('id', list.id);
     let $header = $('<header>');
     let $headerButton = $('<button>').text(list.title);
     let $addCardButton = $('<button>Add a card...</button>')
       .on('click', openCardCreateModal);
-    let $cardContainer = $('<ul>');
-    let $cards = createCards(list.cards);
+    let $cardUl = createCards(list.cards);
 
     $header.append($headerButton);
     $listContainer.append($header);
-    $cardContainer.append($cards);
-    $listContainer.append($cardContainer);
+    $listContainer.append($cardUl);
     $listContainer.append($addCardButton);
 
     return $listContainer;
@@ -71,7 +68,9 @@ function createLists(lists) {
 }
 
 function createCards(cards) {
-  let $cardContainers = cards.map(function(card) {
+  let $cardUl = $('<ul>');
+
+  let $cardLis = cards.map(function(card) {
     let $card = $('<li>');
     let $cardButton = $('<button>').text(card.text);
 
@@ -79,7 +78,9 @@ function createCards(cards) {
     return $card;
   });
 
-  return $cardContainers;
+  $cardUl.append($cardLis);
+
+  return $cardUl;
 }
 
 function renderBoard() {
@@ -97,8 +98,11 @@ function openListCreateModal() {
 }
 
 function openCardCreateModal(event) {
+  let listID = $(event.target).parents('.list').data('id');
+
+  $saveCardButton.data('id', listID);
+
   $createCardInput.val('');
-  listID = event.target.parentNode.id;
   MicroModal.show('create-card');
 }
 
@@ -129,6 +133,7 @@ function handleCardCreate(event) {
   event.preventDefault();
 
   let cardText = $createCardInput.val().trim();
+  let listID = $(event.target).data('id');
 
   if (!cardText) {
     MicroModal.close('create-card');
@@ -144,7 +149,6 @@ function handleCardCreate(event) {
     }
   }).then(function(data) {
     init();
-    console.log(data);
     MicroModal.close('create-card');
   });
 }
