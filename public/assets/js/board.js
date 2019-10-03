@@ -47,9 +47,13 @@ function createLists(lists) {
     let $headerButton = $('<button>').text(list.title);
     let $addCardButton = $('<button>Add a card...</button>')
       .on('click', openCardCreateModal);
+    let $cardContainer = $('<ul>');
+    let $cards = createCards(list.cards);
 
     $header.append($headerButton);
     $listContainer.append($header);
+    $cardContainer.append($cards);
+    $listContainer.append($cardContainer);
     $listContainer.append($addCardButton);
 
     return $listContainer;
@@ -64,6 +68,18 @@ function createLists(lists) {
   $listContainers.push($addListContainer);
 
   return $listContainers;
+}
+
+function createCards(cards) {
+  let $cardContainers = cards.map(function(card) {
+    let $card = $('<li>');
+    let $cardButton = $('<button>').text(card.text);
+
+    $card.append($cardButton);
+    return $card;
+  });
+
+  return $cardContainers;
 }
 
 function renderBoard() {
