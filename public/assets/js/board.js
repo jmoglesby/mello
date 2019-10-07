@@ -136,6 +136,36 @@ function makeSortable() {
       });
     }
   });
+
+  $('.list > ul').each(function(index, element) {
+    Sortable.create(element, {
+      group: 'cards',
+      ghostClass: 'ghost',
+      animation: 200,
+      easing: 'cubic-bezier(0.785, 0.135, 0.15, 0.86)',
+      onEnd: function(event) {
+        let oldList = $(event.from).parent().data().id;
+        let newList = $(event.to).parent().data().id;
+        let { id, position } = $(event.item.childNodes[0]).data();
+        let newPosition = event.newIndex + 1;
+
+        if (newPosition === position && newList === oldList) {
+          return;
+        }
+
+        $.ajax({
+          url: `/api/cards/${id}`,
+          method: 'PUT',
+          data: {
+            position: newPosition,
+            list_id: newList
+          }
+        }).then(function() {
+          init();
+        });
+      }
+    });
+  });
 }
 
 function openListCreateModal() {
