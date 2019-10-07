@@ -47,7 +47,7 @@ function handleLogout() {
 
 function createLists(lists) {
   let $listContainers = lists.map(function(list) {
-    let $listContainer = $('<div class="list">').data('id', list.id);
+    let $listContainer = $('<div class="list">').data(list);
     let $header = $('<header>');
     let $headerButton = $('<button>')
       .text(list.title)
@@ -102,6 +102,70 @@ function renderBoard() {
 
   $boardContainer.empty();
   $boardContainer.append($lists);
+
+  makeSortable();
+}
+
+function makeSortable() {
+  Sortable.create($boardContainer[0], {
+    animation: 400,
+    easing: 'cubic-bezier(0.785, 0.135, 0.15, 0.86)',
+    swapThreshold: 0.85,
+    filter: '.add',
+    ghostClass: 'ghost',
+    onMove: function(event) {
+      let shouldMove = !$(event.related).hasClass('add');
+      return shouldMove;
+    },
+    onEnd: function(event) {
+      let { id, position } = $(event.item).data();
+      let newPosition = event.newIndex + 1;
+
+      if (position === newPosition) {
+        return;
+      }
+
+      $.ajax({
+        url: `/api/lists/${id}`,
+        method: 'PUT',
+        data: {
+          position: newPosition
+        }
+      }).then(function() {
+        init();
+      });
+    }
+  });
+
+  $('.list > ul').each(function(index, element) {
+    Sortable.create(element, {
+      group: 'cards',
+      ghostClass: 'ghost',
+      animation: 200,
+      easing: 'cubic-bezier(0.785, 0.135, 0.15, 0.86)',
+      onEnd: function(event) {
+        let oldList = $(event.from).parent().data().id;
+        let newList = $(event.to).parent().data().id;
+        let { id, position } = $(event.item.childNodes[0]).data();
+        let newPosition = event.newIndex + 1;
+
+        if (newPosition === position && newList === oldList) {
+          return;
+        }
+
+        $.ajax({
+          url: `/api/cards/${id}`,
+          method: 'PUT',
+          data: {
+            position: newPosition,
+            list_id: newList
+          }
+        }).then(function() {
+          init();
+        });
+      }
+    });
+  });
 }
 
 function openListCreateModal() {
