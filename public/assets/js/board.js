@@ -195,7 +195,7 @@ function handleListEdit(event) {
   }).then(function() {
     init();
     MicroModal.close('edit-list');
-  })
+  });
 }
 
 function handleListDelete(event) {
@@ -245,8 +245,18 @@ function handleCardEdit(event) {
   });
 }
 
-function handleCardDelete() {
+function handleCardDelete(event) {
+  event.preventDefault();
 
+  let { id } = $(event.target).data();
+
+  $.ajax({
+    url: `/api/cards/${id}`,
+    method: 'DELETE'
+  }).then(function() {
+    init();
+    MicroModal.close('edit-card');
+  });
 }
 
 $saveCardButton.on('click', handleCardCreate);
