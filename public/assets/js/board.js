@@ -102,6 +102,12 @@ function renderBoard() {
 
   $boardContainer.empty();
   $boardContainer.append($lists);
+
+  makeSortable();
+}
+
+function makeSortable() {
+  Sortable.create($boardContainer[0]);
 }
 
 function openListCreateModal() {
