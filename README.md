@@ -1,4 +1,6 @@
 # Mello
+https://mello-jeremy-oglesby.herokuapp.com
+
 This is a Rails app with heavy ES6/jQuery on the front-end to create a single-page-app style UI. The app emulates Trello, including the drag-and-drop functionality of lists and cards in a board.
 
 Some notable gems and libraries used in this project include: 
