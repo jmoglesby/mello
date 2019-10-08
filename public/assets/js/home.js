@@ -50,10 +50,11 @@ function displayMessage(message, type) {
   $message.text(message).attr('class', type);
 }
 
-function handleSignupResponse(status) {
+function handleSignupResponse(data, status, jqXHR) {
   if (status === 'success') {
     displayMessage('Resitered successfully! You may now sign in.', 'success');
-    setAuth('login');
+    // setAuth('login');
+    handleLoginResponse(data, status, jqXHR);
   } else {
     displayMessage(
       'Something went wrong. A user with this account may already exist.',
@@ -87,7 +88,7 @@ function authenticateUser(email, password) {
     method: 'POST'
   }).then( function(data, status, jqXHR) {
     if (authSetting === 'signup') {
-      handleSignupResponse(status);
+      handleSignupResponse(data, status, jqXHR);
     } else {
       handleLoginResponse(data, status, jqXHR);
     }
