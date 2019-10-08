@@ -111,7 +111,14 @@ function renderBoard() {
 
 function renderContributors() {
   let $contributorListItems = board.users.map(function(user) {
-    let $contributorListItem = $('<li>').text(user.email);
+    let $contributorListItem = $('<li>');
+    let $contributorSpan = $('<span>').text(user.email);
+    let $contributorDeleteButton = $(
+      '<button class="danger">Remove</button>'
+    ).data(user).on('click', handleContributorDelete);
+
+    $contributorListItem.append($contributorSpan, $contributorDeleteButton);
+
     return $contributorListItem;
   });
 
@@ -392,6 +399,30 @@ function handleContributorSave(event) {
 
 function displayMessage(msg, type = 'hidden') {
   $('#contribute .message').attr('class', `message ${type}`).text(msg);
+}
+
+function handleContributorDelete(event) {
+  console.log($(event.target).data());
+  let { id, email } = $(event.target).data();
+
+  $.ajax({
+    url: '/api/user_boards',
+    method: 'DELETE',
+    data: {
+      user_id: id,
+      board_id: board.id
+    }
+  }).then(function() {
+    init();
+    displayMessage(
+      `Successfully removed ${email} from the board`,
+      'success'
+    ).catch(function(err) {
+      if (err.statusText === 'Unauthorized') {
+        location.replace('/boards');
+      }
+    });
+  });
 }
 
 $contributorModalSaveButton.on('click', handleContributorSave);
